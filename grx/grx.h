@@ -5,7 +5,9 @@
 #ifndef GRX_H
 #define GRX_H
 
-//#include <surface.h>
+#include <string>
+
+#include <surface.h>
 
 #include <glm/glm.hpp>
 #include <vulkan/vulkan.h>
@@ -13,7 +15,15 @@
 
 class xcGraphics {
     public:
-        xcGraphics(void *surface);
+        xcGraphics(xcSurface *surface);
+
+		bool draw(float deltaTime);
+
+		bool hasModel(std::string modelFilename);
+		//std::shared_ptr<AssimpModel> getModel(std::string modelFilename);
+		bool addModel(std::string modelFilename);
+		bool delModel(std::string modelFilename);
+
 		void cleanup();
 	private:
 		VkSurfaceKHR surface = VK_NULL_HANDLE;

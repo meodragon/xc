@@ -5,7 +5,7 @@
 #include "surface.h"
 #include <stdio.h>
 
-const char g_szClassName[] = "qcrWindowClass";
+const char g_szClassName[] = "xcWindowClass";
 
 LRESULT CALLBACK MSG_CALLBACK(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
     xcSurface *ptr;

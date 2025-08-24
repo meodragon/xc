@@ -4,6 +4,6 @@
 
 #include "grx.h"
 
-xcGraphics::xcGraphics(void *surface) {
+xcGraphics::xcGraphics(xcSurface *surface) {
 
 }
