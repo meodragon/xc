@@ -16,7 +16,7 @@
 class xcGraphics {
     public:
         xcGraphics(xcSurface *surface);
-
+		bool init();
 		bool draw(float deltaTime);
 
 		bool hasModel(std::string modelFilename);

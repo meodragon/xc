@@ -7,3 +7,11 @@
 xcGraphics::xcGraphics(xcSurface *surface) {
 
 }
+
+bool xcGraphics::init() {
+	//deviceInit();
+	//initVma();
+	//getQueues();
+	//createSwapChain();
+	return false;
+}

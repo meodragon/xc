@@ -49,7 +49,7 @@ LRESULT CALLBACK MSG_CALLBACK(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
     return 0;
 }
 
-bool xcSurface::init() {
+bool xcSurface::init(unsigned int width, unsigned int height) {
 	WNDCLASSEX wc;
 
     hInstance = GetModuleHandle(NULL);
@@ -82,7 +82,7 @@ bool xcSurface::init() {
         g_szClassName,
         "xc",
         WS_OVERLAPPEDWINDOW,
-        CW_USEDEFAULT, CW_USEDEFAULT, 640, 480,
+        CW_USEDEFAULT, CW_USEDEFAULT, width, height,
         NULL, NULL, hInstance, this);
 
     if(hWnd == NULL) {

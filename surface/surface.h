@@ -17,7 +17,7 @@ class xcSurface {
 		uint32_t width;
 		uint32_t height;
 
-		bool init();
+		bool init(unsigned int, unsigned int);
         void run();
 		void cleanup();
     private:

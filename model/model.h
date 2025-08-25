@@ -5,7 +5,7 @@
 #ifndef MODEL_H
 #define MODEL_H
 
-#include <mesh.h>
+#include <render_data.h>
 
 class Model {
     public:
