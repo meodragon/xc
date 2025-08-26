@@ -9,12 +9,15 @@
 int main(int argc, char *argv[]) {
     xcSurface *xcs = new xcSurface();
 
-    if (!xcs->init(640, 480)) {
+	unsigned int WIDTH = 640;
+	unsigned int HEIGHT = 480;
+
+	if (!xcs->init(WIDTH, HEIGHT)) {
         return -1;
     }
 
 	xcGraphics *xcg = new xcGraphics(xcs);
-	xcg->init();
+	xcg->init(WIDTH, HEIGHT);
 
     xcs->run();
 

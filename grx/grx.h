@@ -10,13 +10,16 @@
 #include <surface.h>
 
 #include <glm/glm.hpp>
+#define VK_USE_PLATFORM_WIN32_KHR
 #include <vulkan/vulkan.h>
 #include <vma/vk_mem_alloc.h>
+
+#include <VkBootstrap.h>
 
 class xcGraphics {
     public:
         xcGraphics(xcSurface *surface);
-		bool init();
+		bool init(unsigned int width, unsigned int height);
 		bool draw(float deltaTime);
 
 		bool hasModel(std::string modelFilename);
@@ -26,7 +29,18 @@ class xcGraphics {
 
 		void cleanup();
 	private:
+		xcSurface *xc_surface = nullptr;
+		unsigned int surface_width = 0;
+		unsigned int surface_height = 0;
 		VkSurfaceKHR surface = VK_NULL_HANDLE;
+
+		vkb::Instance rdVkbInstance{};
+		vkb::PhysicalDevice rdVkbPhysicalDevice{};
+  		vkb::Device rdVkbDevice{};
+
+		VkDeviceSize mMinSSBOOffsetAlignment = 0;
+
+		void deviceInit();
 };
 
 #endif //GRX_H
