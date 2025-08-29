@@ -37,10 +37,17 @@ class xcGraphics {
 		vkb::Instance rdVkbInstance{};
 		vkb::PhysicalDevice rdVkbPhysicalDevice{};
   		vkb::Device rdVkbDevice{};
+		VmaAllocator rdAllocator = nullptr;
+
+		VkQueue rdGraphicsQueue = VK_NULL_HANDLE;
+		VkQueue rdPresentQueue = VK_NULL_HANDLE;
 
 		VkDeviceSize mMinSSBOOffsetAlignment = 0;
 
 		void deviceInit();
+		void vmaInit();
+		void getQueues();
+		void createSwapChain();
 };
 
 #endif //GRX_H

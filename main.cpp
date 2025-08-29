@@ -3,6 +3,7 @@
 //
 //#include <memory>
 
+#define VMA_IMPLEMENTATION
 #include <surface.h>
 #include <grx.h>
 

@@ -15,9 +15,8 @@ bool xcGraphics::init(unsigned int width, unsigned int height) {
 	surface_height = height;
 
 	deviceInit();
-	//initVma();
-	//getQueues();
-	//createSwapChain();
+	vmaInit();
+	createSwapChain();
 	return false;
 }
 
@@ -107,4 +106,61 @@ void xcGraphics::deviceInit() {
     	exit(EXIT_FAILURE);
   	}
   	rdVkbDevice = devBuilderRet.value();
+}
+
+void xcGraphics::vmaInit() {
+	VmaAllocatorCreateInfo allocatorInfo{};
+	allocatorInfo.physicalDevice = rdVkbPhysicalDevice.physical_device;
+	allocatorInfo.device = rdVkbDevice.device;
+	allocatorInfo.instance = rdVkbInstance.instance;
+
+	VkResult result = vmaCreateAllocator(&allocatorInfo, &rdAllocator);
+	if (result != VK_SUCCESS) {
+		printf("[%s:%d] error: could not init VMA (error %i)\n", __FUNCTION__, __LINE__, result);
+		exit(EXIT_FAILURE);
+	}
+}
+
+void xcGraphics::getQueues() {
+	auto graphQueueRet = rdVkbDevice.get_queue(vkb::QueueType::graphics);
+	if (!graphQueueRet.has_value()) {
+		printf("[%s:%d] error: could not get graphics queue\n", __FUNCTION__, __LINE__);
+		exit(EXIT_FAILURE);
+	}
+	rdGraphicsQueue = graphQueueRet.value();
+
+	auto presentQueueRet = rdVkbDevice.get_queue(vkb::QueueType::present);
+	if (!presentQueueRet.has_value()) {
+		printf("[%s:%d] error: could not get present queue\n", __FUNCTION__, __LINE__);
+		exit(EXIT_FAILURE);
+	}
+	rdPresentQueue = presentQueueRet.value();
+}
+
+void xcGraphics::createSwapChain() {
+	vkb::SwapchainBuilder swapChainBuild{mRenderData.rdVkbDevice};
+  VkSurfaceFormatKHR surfaceFormat;
+
+  /* set surface to non-sRGB */
+  surfaceFormat.colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
+  surfaceFormat.format = VK_FORMAT_B8G8R8A8_UNORM;
+
+  /* VK_PRESENT_MODE_FIFO_KHR enables vsync */
+  auto  swapChainBuildRet = swapChainBuild
+    .set_old_swapchain(mRenderData.rdVkbSwapchain)
+    .set_desired_present_mode(VK_PRESENT_MODE_FIFO_KHR)
+    .set_desired_format(surfaceFormat)
+    .build();
+
+  if (!swapChainBuildRet) {
+    Logger::log(1, "%s error: could not init swapchain\n", __FUNCTION__);
+    return false;
+  }
+
+  vkb::destroy_swapchain(mRenderData.rdVkbSwapchain);
+  mRenderData.rdVkbSwapchain = swapChainBuildRet.value();
+  mRenderData.rdSwapchainImages = swapChainBuildRet.value().get_images().value();
+  mRenderData.rdSwapchainImageViews = swapChainBuildRet.value().get_image_views().value();
+
+  return true;
 }
