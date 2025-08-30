@@ -16,6 +16,10 @@
 
 #include <surface.h>
 
+#include <vma/vk_mem_alloc.h>
+
+#include <VkBootstrap.h>
+
 struct Vertex {
     glm::vec3 position = glm::vec3(0.0f);
     glm::vec4 color = glm::vec4(1.0f);
@@ -53,6 +57,25 @@ struct RenderData {
     float rdUIDrawTime = 0.0f;
 
     /* Vulkan Objects */
+	vkb::Instance rdVkbInstance{};
+	vkb::PhysicalDevice rdVkbPhysicalDevice{};
+  	vkb::Device rdVkbDevice{};
+	VmaAllocator rdAllocator = nullptr;
+
+	VkQueue rdGraphicsQueue = VK_NULL_HANDLE;
+	VkQueue rdPresentQueue = VK_NULL_HANDLE;
+
+	vkb::Swapchain rdVkbSwapChain{};
+
+  	std::vector<VkImage> rdSwapChainImages{};
+  	std::vector<VkImageView> rdSwapChainImageViews{};
+
+  	VkFormat rdDepthFormat = VK_FORMAT_UNDEFINED;
+	VkImage rdDepthImage = VK_NULL_HANDLE;
+  	VmaAllocation rdDepthImageAlloc = VK_NULL_HANDLE;
+  	VkImageView rdDepthImageView = VK_NULL_HANDLE;
+
+    VkCommandPool rdCommandPool = VK_NULL_HANDLE;
 };
 
 #endif //RENDER_DATA_H

@@ -12,9 +12,8 @@
 #include <glm/glm.hpp>
 #define VK_USE_PLATFORM_WIN32_KHR
 #include <vulkan/vulkan.h>
-#include <vma/vk_mem_alloc.h>
 
-#include <VkBootstrap.h>
+#include <render_data.h>
 
 class xcGraphics {
     public:
@@ -34,32 +33,16 @@ class xcGraphics {
 		unsigned int surface_height = 0;
 		VkSurfaceKHR surface = VK_NULL_HANDLE;
 
-		vkb::Instance rdVkbInstance{};
-		vkb::PhysicalDevice rdVkbPhysicalDevice{};
-  		vkb::Device rdVkbDevice{};
-		VmaAllocator rdAllocator = nullptr;
-
-		VkQueue rdGraphicsQueue = VK_NULL_HANDLE;
-		VkQueue rdPresentQueue = VK_NULL_HANDLE;
-
-		vkb::Swapchain rdVkbSwapChain{};
-
-  		std::vector<VkImage> rdSwapChainImages{};
-  		std::vector<VkImageView> rdSwapChainImageViews{};
-
-  		VkFormat rdDepthFormat = VK_FORMAT_UNDEFINED;
-		VkImage rdDepthImage = VK_NULL_HANDLE;
-  		VmaAllocation rdDepthImageAlloc = VK_NULL_HANDLE;
-  		VkImageView rdDepthImageView = VK_NULL_HANDLE;
-
 		VkDeviceSize mMinSSBOOffsetAlignment = 0;
+
+		RenderData render_data;
 
 		void deviceInit();
 		void vmaInit();
 		void getQueues();
 		void createSwapChain();
 		void createDepthBuffer();
-		//void createCommandPool();
+		void createCommandPool();
 		//void createCommandBuffer();
 };
 
