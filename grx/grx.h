@@ -42,12 +42,25 @@ class xcGraphics {
 		VkQueue rdGraphicsQueue = VK_NULL_HANDLE;
 		VkQueue rdPresentQueue = VK_NULL_HANDLE;
 
+		vkb::Swapchain rdVkbSwapChain{};
+
+  		std::vector<VkImage> rdSwapChainImages{};
+  		std::vector<VkImageView> rdSwapChainImageViews{};
+
+  		VkFormat rdDepthFormat = VK_FORMAT_UNDEFINED;
+		VkImage rdDepthImage = VK_NULL_HANDLE;
+  		VmaAllocation rdDepthImageAlloc = VK_NULL_HANDLE;
+  		VkImageView rdDepthImageView = VK_NULL_HANDLE;
+
 		VkDeviceSize mMinSSBOOffsetAlignment = 0;
 
 		void deviceInit();
 		void vmaInit();
 		void getQueues();
 		void createSwapChain();
+		void createDepthBuffer();
+		//void createCommandPool();
+		//void createCommandBuffer();
 };
 
 #endif //GRX_H

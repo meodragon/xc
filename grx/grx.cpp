@@ -17,6 +17,9 @@ bool xcGraphics::init(unsigned int width, unsigned int height) {
 	deviceInit();
 	vmaInit();
 	createSwapChain();
+	createDepthBuffer();
+	//createCommandPool();
+	//createCommandBuffer();
 	return false;
 }
 
@@ -26,6 +29,14 @@ void xcGraphics::cleanup() {
     	printf("%s fatal error: could not wait for device idle (error: %i)\n", __FUNCTION__, result);
     	return;
   	}
+
+	vkDestroyImageView(rdVkbDevice.device, rdDepthImageView, nullptr);
+
+  	vmaDestroyImage(rdAllocator, rdDepthImage, rdDepthImageAlloc);
+  	vmaDestroyAllocator(rdAllocator);
+
+  	rdVkbSwapChain.destroy_image_views(rdSwapChainImageViews);
+  	vkb::destroy_swapchain(rdVkbSwapChain);
 
 	vkb::destroy_device(rdVkbDevice);
   	vkb::destroy_surface(rdVkbInstance.instance, surface);
@@ -138,29 +149,77 @@ void xcGraphics::getQueues() {
 }
 
 void xcGraphics::createSwapChain() {
-	vkb::SwapchainBuilder swapChainBuild{mRenderData.rdVkbDevice};
-  VkSurfaceFormatKHR surfaceFormat;
+	vkb::SwapchainBuilder swapChainBuild{rdVkbDevice};
+  	VkSurfaceFormatKHR surfaceFormat;
 
-  /* set surface to non-sRGB */
-  surfaceFormat.colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
-  surfaceFormat.format = VK_FORMAT_B8G8R8A8_UNORM;
+  	/* set surface to non-sRGB */
+  	surfaceFormat.colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
+  	surfaceFormat.format = VK_FORMAT_B8G8R8A8_UNORM;
 
-  /* VK_PRESENT_MODE_FIFO_KHR enables vsync */
-  auto  swapChainBuildRet = swapChainBuild
-    .set_old_swapchain(mRenderData.rdVkbSwapchain)
-    .set_desired_present_mode(VK_PRESENT_MODE_FIFO_KHR)
-    .set_desired_format(surfaceFormat)
-    .build();
+  	/* VK_PRESENT_MODE_FIFO_KHR enables vsync */
+  	auto  swapChainBuildRet = swapChainBuild
+    	.set_old_swapchain(rdVkbSwapChain)
+    	.set_desired_present_mode(VK_PRESENT_MODE_FIFO_KHR)
+    	.set_desired_format(surfaceFormat)
+    	.build();
 
-  if (!swapChainBuildRet) {
-    Logger::log(1, "%s error: could not init swapchain\n", __FUNCTION__);
-    return false;
-  }
+  	if (!swapChainBuildRet) {
+    	printf("[%s:%d] error: could not init swapchain\n", __FUNCTION__, __LINE__);
+    	exit(EXIT_FAILURE);
+  	}
 
-  vkb::destroy_swapchain(mRenderData.rdVkbSwapchain);
-  mRenderData.rdVkbSwapchain = swapChainBuildRet.value();
-  mRenderData.rdSwapchainImages = swapChainBuildRet.value().get_images().value();
-  mRenderData.rdSwapchainImageViews = swapChainBuildRet.value().get_image_views().value();
-
-  return true;
+  	vkb::destroy_swapchain(rdVkbSwapChain);
+  	rdVkbSwapChain = swapChainBuildRet.value();
+  	rdSwapChainImages = swapChainBuildRet.value().get_images().value();
+  	rdSwapChainImageViews = swapChainBuildRet.value().get_image_views().value();
 }
+
+void xcGraphics::createDepthBuffer() {
+	VkExtent3D depthImageExtent = {
+        rdVkbSwapChain.extent.width,
+        rdVkbSwapChain.extent.height,
+        1
+  	};
+
+  	rdDepthFormat = VK_FORMAT_D32_SFLOAT;
+
+  	VkImageCreateInfo depthImageInfo{};
+  	depthImageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+  	depthImageInfo.imageType = VK_IMAGE_TYPE_2D;
+  	depthImageInfo.format = rdDepthFormat;
+  	depthImageInfo.extent = depthImageExtent;
+  	depthImageInfo.mipLevels = 1;
+  	depthImageInfo.arrayLayers = 1;
+  	depthImageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+  	depthImageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+  	depthImageInfo.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+
+  	VmaAllocationCreateInfo depthAllocInfo{};
+  	depthAllocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
+  	depthAllocInfo.requiredFlags = VkMemoryPropertyFlags(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+
+  	VkResult result = vmaCreateImage(rdAllocator, &depthImageInfo, &depthAllocInfo, &rdDepthImage, &rdDepthImageAlloc, nullptr);
+  	if (result != VK_SUCCESS) {
+    	printf("[%s:%d] error: could not allocate depth buffer memory (error: %i)\n", __FUNCTION__, __LINE__, result);
+    	exit(EXIT_FAILURE);
+  	}
+
+  	VkImageViewCreateInfo depthImageViewinfo{};
+  	depthImageViewinfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+  	depthImageViewinfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+  	depthImageViewinfo.image = rdDepthImage;
+  	depthImageViewinfo.format = rdDepthFormat;
+  	depthImageViewinfo.subresourceRange.baseMipLevel = 0;
+  	depthImageViewinfo.subresourceRange.levelCount = 1;
+  	depthImageViewinfo.subresourceRange.baseArrayLayer = 0;
+  	depthImageViewinfo.subresourceRange.layerCount = 1;
+  	depthImageViewinfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+
+  	result = vkCreateImageView(rdVkbDevice.device, &depthImageViewinfo, nullptr, &rdDepthImageView);
+  	if (result != VK_SUCCESS) {
+    	printf("[%s:%d] error: could not create depth buffer image view (error: %i)\n", __FUNCTION__, __LINE__, result);
+    	exit(EXIT_FAILURE);
+	}
+}
+
+//void xcGraphics::createCommandPool() {}

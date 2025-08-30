@@ -33,11 +33,13 @@ struct Mesh {
 };
 
 struct RenderData {
+	/* Window/Surface */
     xcSurface *surface = nullptr;
 
     int rdWidth = 0;
     int rdHeight = 0;
 
+	/**/
     unsigned int rdTriangleCount = 0;
     unsigned int rdMatricesSize = 0;
 
@@ -49,6 +51,8 @@ struct RenderData {
     float rdUploadToUBOTime = 0.0f;
     float rdUIGenerateTime = 0.0f;
     float rdUIDrawTime = 0.0f;
+
+    /* Vulkan Objects */
 };
 
 #endif //RENDER_DATA_H
