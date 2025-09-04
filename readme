@@ -1,5 +1,9 @@
 PROJECT xc
 
+BUILD
+
+With CMake, the directory for VkBootstrap is assumed to be at 'D:/Developer/'
+
 COMMITTER meo-dragon
 
 ORGANIZATION ikvu.vn

@@ -35,7 +35,7 @@ class xcGraphics {
 
 		VkDeviceSize mMinSSBOOffsetAlignment = 0;
 
-		RenderData render_data;
+		RenderData renderData;
 
         VkUniformBufferData mPerspectiveViewMatrixUBO{};
 
