@@ -37,13 +37,25 @@ class xcGraphics {
 
 		RenderData render_data;
 
+        VkUniformBufferData mPerspectiveViewMatrixUBO{};
+
+    	VkShaderStorageBufferData mWorldPosBuffer{};
+    	VkShaderStorageBufferData mBoneMatrixBuffer{};
+
 		void deviceInit();
 		void vmaInit();
 		void getQueues();
 		void createSwapChain();
 		void createDepthBuffer();
 		void createCommandPool();
-		//void createCommandBuffer();
+		void createCommandBuffer();
+        void createMatrixUBO();
+        void createSSBOs();
+        void createDescriptorPool();
+        void createDescriptorLayouts();
+        void createDescriptorSets();
+		void updateDescriptorSets();
+		void createRenderPass();
 };
 
 #endif //GRX_H

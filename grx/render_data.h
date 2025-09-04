@@ -36,6 +36,27 @@ struct Mesh {
     bool usesPBRColors = false;
 };
 
+struct VkUniformBufferData {
+  size_t bufferSize = 0;
+  VkBuffer buffer = VK_NULL_HANDLE;
+  VmaAllocation bufferAlloc = nullptr;
+
+  VkDescriptorSet descriptorSet = VK_NULL_HANDLE;
+};
+
+struct VkUploadMatrices {
+  glm::mat4 viewMatrix{};
+  glm::mat4 projectionMatrix{};
+};
+
+struct VkShaderStorageBufferData {
+  size_t bufferSize = 0;
+  VkBuffer buffer = VK_NULL_HANDLE;
+  VmaAllocation bufferAlloc = nullptr;
+
+  VkDescriptorSet descriptorSet = VK_NULL_HANDLE;
+};
+
 struct RenderData {
 	/* Window/Surface */
     xcSurface *surface = nullptr;
@@ -76,6 +97,16 @@ struct RenderData {
   	VkImageView rdDepthImageView = VK_NULL_HANDLE;
 
     VkCommandPool rdCommandPool = VK_NULL_HANDLE;
+	VkCommandBuffer rdCommandBuffer = VK_NULL_HANDLE;
+
+	VkDescriptorPool rdDescriptorPool = VK_NULL_HANDLE;
+
+  	VkDescriptorSetLayout rdAssimpTextureDescriptorLayout = VK_NULL_HANDLE;
+	VkDescriptorSetLayout rdAssimpDescriptorLayout = VK_NULL_HANDLE;
+	VkDescriptorSet rdAssimpDescriptorSet = VK_NULL_HANDLE;
+	VkDescriptorSet rdAssimpSkinningDescriptorSet = VK_NULL_HANDLE;
+
+    VkRenderPass rdRenderPass = VK_NULL_HANDLE;
 };
 
 #endif //RENDER_DATA_H
