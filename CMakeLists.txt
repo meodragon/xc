@@ -14,6 +14,21 @@ include_directories(surface)
 link_directories("$ENV{VULKAN_SDK}/Lib")
 link_directories("$ENV{ASSIMP_SDK}/lib/Debug")
 
+
+set(SHADER_FILE_LIST "assimp.vert" "assimp.frag")
+foreach(item IN LISTS SHADER_FILE_LIST)
+    add_custom_command(
+            OUTPUT ${item}.spv
+            COMMAND $ENV{VULKAN_SDK}/Bin/glslc.exe
+                -c ${CMAKE_SOURCE_DIR}/shader/${item}
+                -o ${CMAKE_BINARY_DIR}/${item}.spv
+            DEPENDS ${CMAKE_SOURCE_DIR}/shader/${item}
+            COMMENT "Compile shader: ${item}"
+            VERBATIM
+    )
+    list(APPEND COMPILED_SHADER_FILES ${CMAKE_BINARY_DIR}/${item}.spv)
+endforeach()
+
 add_executable(xc
         grx/CommandBuffer.cpp
         grx/CommandBuffer.h
@@ -36,6 +51,9 @@ add_executable(xc
         surface/surface.cpp
         surface/surface.h
         "${VK_BOOTSTRAP_PATH}/VkBootstrap.cpp"
-        main.cpp)
+        main.cpp
+        grx/PipelineLayout.cpp
+        grx/PipelineLayout.h
+        ${COMPILED_SHADER_FILES})
 
 target_link_libraries(xc vulkan-1.lib assimp-vc143-mtd.lib)

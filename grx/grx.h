@@ -56,6 +56,8 @@ class xcGraphics {
         void createDescriptorSets();
 		void updateDescriptorSets();
 		void createRenderPass();
+		void createPipelineLayouts();
+		void createPipelines();
 };
 
 #endif //GRX_H

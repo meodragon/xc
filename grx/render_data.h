@@ -57,6 +57,11 @@ struct VkShaderStorageBufferData {
   VkDescriptorSet descriptorSet = VK_NULL_HANDLE;
 };
 
+struct VkPushConstants {
+	int pkModelStride;
+	int pkWorldPosOffset;
+};
+
 struct RenderData {
 	/* Window/Surface */
     xcSurface *surface = nullptr;
@@ -107,6 +112,9 @@ struct RenderData {
 	VkDescriptorSet rdAssimpSkinningDescriptorSet = VK_NULL_HANDLE;
 
     VkRenderPass rdRenderPass = VK_NULL_HANDLE;
+
+	VkPipelineLayout rdAssimpPipelineLayout = VK_NULL_HANDLE;
+	VkPipelineLayout rdAssimpSkinningPipelineLayout = VK_NULL_HANDLE;
 };
 
 #endif //RENDER_DATA_H

@@ -45,3 +45,6 @@
 
 # resource
 *.res
+
+# build directory (batch)
+build/

@@ -12,6 +12,7 @@
 #include <UniformBuffer.h>
 #include <ShaderStorageBuffer.h>
 #include <RenderPass.h>
+#include <PipelineLayout.h>
 
 xcGraphics::xcGraphics(xcSurface *surface) {
 	xc_surface = surface;
@@ -33,6 +34,7 @@ bool xcGraphics::init(unsigned int width, unsigned int height) {
 	createDescriptorLayouts();
 	createDescriptorSets();
 	createRenderPass();
+	createPipelineLayouts();
 	return false;
 }
 
@@ -46,6 +48,8 @@ void xcGraphics::cleanup() {
     CommandBuffer::cleanup(renderData, renderData.rdCommandBuffer);
     CommandPool::cleanup(renderData);
 
+	PipelineLayout::cleanup(renderData, renderData.rdAssimpPipelineLayout);
+	PipelineLayout::cleanup(renderData, renderData.rdAssimpSkinningPipelineLayout);
     RenderPass::cleanup(renderData);
 
     UniformBuffer::cleanup(renderData, mPerspectiveViewMatrixUBO);
@@ -482,4 +486,44 @@ void xcGraphics::createRenderPass() {
         printf("%s error: could not init render pass\n", __FUNCTION__);
         exit(EXIT_FAILURE);
     }
+}
+
+void xcGraphics::createPipelineLayouts() {
+	/* non-animated model */
+	std::vector<VkDescriptorSetLayout> layouts = {
+		renderData.rdAssimpTextureDescriptorLayout,
+		renderData.rdAssimpDescriptorLayout };
+
+	std::vector<VkPushConstantRange> pushConstants = { { VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(VkPushConstants) } };
+
+	if (!PipelineLayout::init(renderData, renderData.rdAssimpPipelineLayout, layouts, pushConstants)) {
+		printf("%s error: could not init Assimp pipeline layout\n", __FUNCTION__);
+		exit(EXIT_FAILURE);
+	}
+
+	/* animated model */
+	if (!PipelineLayout::init(renderData, renderData.rdAssimpSkinningPipelineLayout, layouts, pushConstants)) {
+		printf("%s error: could not init Assimp Skinning pipeline layout\n", __FUNCTION__);
+		exit(EXIT_FAILURE);
+	}
+}
+
+void xcGraphics::createPipelines() {
+	std::string vertexShaderFile = "assimp.vert.spv";
+	std::string fragmentShaderFile = "assimp.frag.spv";
+	// if (!SkinningPipeline::init(renderData, renderData.rdAssimpPipelineLayout,
+	// 	mRenderData.rdAssimpPipeline, vertexShaderFile, fragmentShaderFile)) {
+	// 	Logger::log(1, "%s error: could not init Assimp shader pipeline\n", __FUNCTION__);
+	// 	return false;
+	// 	}
+	//
+	// vertexShaderFile = "shader/assimp_skinning.vert.spv";
+	// fragmentShaderFile = "shader/assimp_skinning.frag.spv";
+	// if (!SkinningPipeline::init(renderData, renderData.rdAssimpSkinningPipelineLayout,
+	// 	renderData.rdAssimpSkinningPipeline, vertexShaderFile, fragmentShaderFile)) {
+	// 	Logger::log(1, "%s error: could not init Assimp Skinning shader pipeline\n", __FUNCTION__);
+	// 	return false;
+	// 	}
+	// return true;
+	return;
 }
