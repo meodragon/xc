@@ -7,6 +7,8 @@ include_directories("$ENV{VULKAN_SDK}/Include")
 set(VK_BOOTSTRAP_PATH "D:/Developer/vk-bootstrap/src")
 include_directories("${VK_BOOTSTRAP_PATH}")
 include_directories("$ENV{ASSIMP_SDK}/include")
+include_directories("$ENV{IMGUI_SDK}")
+include_directories("$ENV{IMGUI_SDK}/backends")
 include_directories(grx)
 include_directories(model)
 include_directories(surface)
@@ -14,7 +16,6 @@ include_directories(tools)
 
 link_directories("$ENV{VULKAN_SDK}/Lib")
 link_directories("$ENV{ASSIMP_SDK}/lib/Debug")
-
 
 set(SHADER_FILE_LIST "assimp.vert" "assimp.frag" "assimp_skinning.vert" "assimp_skinning.frag")
 foreach(item IN LISTS SHADER_FILE_LIST)
@@ -29,6 +30,10 @@ foreach(item IN LISTS SHADER_FILE_LIST)
     )
     list(APPEND COMPILED_SHADER_FILES ${CMAKE_BINARY_DIR}/${item}.spv)
 endforeach()
+
+string(REPLACE "\\" "/" IMGUI_SRC $ENV{IMGUI_SDK})
+file(GLOB IMGUI "${IMGUI_SRC}/imgui*.cpp" "${IMGUI_SRC}/backends/imgui_impl_vulkan.cpp"
+        "${IMGUI_SRC}/backends/imgui_impl_win32.cpp")
 
 add_executable(xc
         grx/CommandBuffer.cpp
@@ -67,6 +72,7 @@ add_executable(xc
         grx/SyncObjects.cpp
         grx/SyncObjects.h
         grx/UserInterface.cpp
-        grx/UserInterface.h)
+        grx/UserInterface.h
+        ${IMGUI})
 
 target_link_libraries(xc vulkan-1.lib assimp-vc143-mtd.lib)
