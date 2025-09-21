@@ -10,12 +10,13 @@ include_directories("$ENV{ASSIMP_SDK}/include")
 include_directories(grx)
 include_directories(model)
 include_directories(surface)
+include_directories(tools)
 
 link_directories("$ENV{VULKAN_SDK}/Lib")
 link_directories("$ENV{ASSIMP_SDK}/lib/Debug")
 
 
-set(SHADER_FILE_LIST "assimp.vert" "assimp.frag")
+set(SHADER_FILE_LIST "assimp.vert" "assimp.frag" "assimp_skinning.vert" "assimp_skinning.frag")
 foreach(item IN LISTS SHADER_FILE_LIST)
     add_custom_command(
             OUTPUT ${item}.spv
@@ -54,6 +55,18 @@ add_executable(xc
         main.cpp
         grx/PipelineLayout.cpp
         grx/PipelineLayout.h
-        ${COMPILED_SHADER_FILES})
+        ${COMPILED_SHADER_FILES}
+        grx/SkinningPipeline.cpp
+        grx/SkinningPipeline.h
+        grx/Shader.cpp
+        grx/Shader.h
+        tools/Tools.cpp
+        tools/Tools.h
+        grx/Framebuffer.cpp
+        grx/Framebuffer.h
+        grx/SyncObjects.cpp
+        grx/SyncObjects.h
+        grx/UserInterface.cpp
+        grx/UserInterface.h)
 
 target_link_libraries(xc vulkan-1.lib assimp-vc143-mtd.lib)

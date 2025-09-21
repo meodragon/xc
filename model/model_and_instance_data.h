@@ -7,6 +7,7 @@
 
 #include <memory>
 #include <unordered_set>
+#include <functional>
 
 class AssimpModel;
 class AssimpInstance;

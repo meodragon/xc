@@ -13,6 +13,9 @@
 #include <ShaderStorageBuffer.h>
 #include <RenderPass.h>
 #include <PipelineLayout.h>
+#include <SkinningPipeline.h>
+#include <Framebuffer.h>
+#include <SyncObjects.h>
 
 xcGraphics::xcGraphics(xcSurface *surface) {
 	xc_surface = surface;
@@ -35,6 +38,11 @@ bool xcGraphics::init(unsigned int width, unsigned int height) {
 	createDescriptorSets();
 	createRenderPass();
 	createPipelineLayouts();
+	createFramebuffer();
+	createSyncObjects();
+
+	initUserInterface();
+
 	return false;
 }
 
@@ -45,8 +53,15 @@ void xcGraphics::cleanup() {
     	return;
   	}
 
+	mUserInterface.cleanup(renderData);
+
+	SyncObjects::cleanup(renderData);
     CommandBuffer::cleanup(renderData, renderData.rdCommandBuffer);
     CommandPool::cleanup(renderData);
+	Framebuffer::cleanup(renderData);
+
+	SkinningPipeline::cleanup(renderData, renderData.rdAssimpPipeline);
+	SkinningPipeline::cleanup(renderData, renderData.rdAssimpSkinningPipeline);
 
 	PipelineLayout::cleanup(renderData, renderData.rdAssimpPipelineLayout);
 	PipelineLayout::cleanup(renderData, renderData.rdAssimpSkinningPipelineLayout);
@@ -511,19 +526,38 @@ void xcGraphics::createPipelineLayouts() {
 void xcGraphics::createPipelines() {
 	std::string vertexShaderFile = "assimp.vert.spv";
 	std::string fragmentShaderFile = "assimp.frag.spv";
-	// if (!SkinningPipeline::init(renderData, renderData.rdAssimpPipelineLayout,
-	// 	mRenderData.rdAssimpPipeline, vertexShaderFile, fragmentShaderFile)) {
-	// 	Logger::log(1, "%s error: could not init Assimp shader pipeline\n", __FUNCTION__);
-	// 	return false;
-	// 	}
-	//
-	// vertexShaderFile = "shader/assimp_skinning.vert.spv";
-	// fragmentShaderFile = "shader/assimp_skinning.frag.spv";
-	// if (!SkinningPipeline::init(renderData, renderData.rdAssimpSkinningPipelineLayout,
-	// 	renderData.rdAssimpSkinningPipeline, vertexShaderFile, fragmentShaderFile)) {
-	// 	Logger::log(1, "%s error: could not init Assimp Skinning shader pipeline\n", __FUNCTION__);
-	// 	return false;
-	// 	}
-	// return true;
-	return;
+	if (!SkinningPipeline::init(renderData, renderData.rdAssimpPipelineLayout,
+		renderData.rdAssimpPipeline, vertexShaderFile, fragmentShaderFile)) {
+		printf("%s error: could not init Assimp shader pipeline\n", __FUNCTION__);
+		exit(EXIT_FAILURE);
+		}
+
+	vertexShaderFile = "assimp_skinning.vert.spv";
+	fragmentShaderFile = "assimp_skinning.frag.spv";
+	if (!SkinningPipeline::init(renderData, renderData.rdAssimpSkinningPipelineLayout,
+		renderData.rdAssimpSkinningPipeline, vertexShaderFile, fragmentShaderFile)) {
+		printf("%s error: could not init Assimp Skinning shader pipeline\n", __FUNCTION__);
+		exit(EXIT_FAILURE);
+		}
+}
+
+void xcGraphics::createFramebuffer() {
+	if (!Framebuffer::init(renderData)) {
+		printf("%s error: could not init framebuffer\n", __FUNCTION__);
+		exit(EXIT_FAILURE);
+	}
+}
+
+void xcGraphics::createSyncObjects() {
+	if (!SyncObjects::init(renderData)) {
+		printf("%s error: could not create sync objects\n", __FUNCTION__);
+		exit(EXIT_FAILURE);
+	}
+}
+
+void xcGraphics::initUserInterface() {
+	if (!mUserInterface.init(renderData)) {
+		printf("%s error: could not init ImGui\n", __FUNCTION__);
+		exit(EXIT_FAILURE);
+	}
 }

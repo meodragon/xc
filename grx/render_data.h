@@ -95,6 +95,7 @@ struct RenderData {
 
   	std::vector<VkImage> rdSwapChainImages{};
   	std::vector<VkImageView> rdSwapChainImageViews{};
+	std::vector<VkFramebuffer> rdFramebuffers{};
 
   	VkFormat rdDepthFormat = VK_FORMAT_UNDEFINED;
 	VkImage rdDepthImage = VK_NULL_HANDLE;
@@ -115,6 +116,13 @@ struct RenderData {
 
 	VkPipelineLayout rdAssimpPipelineLayout = VK_NULL_HANDLE;
 	VkPipelineLayout rdAssimpSkinningPipelineLayout = VK_NULL_HANDLE;
+
+	VkPipeline rdAssimpPipeline = VK_NULL_HANDLE;
+	VkPipeline rdAssimpSkinningPipeline = VK_NULL_HANDLE;
+
+	VkSemaphore rdPresentSemaphore = VK_NULL_HANDLE;
+	VkSemaphore rdRenderSemaphore = VK_NULL_HANDLE;
+	VkFence rdRenderFence = VK_NULL_HANDLE;
 };
 
 #endif //RENDER_DATA_H

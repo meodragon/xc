@@ -14,6 +14,7 @@
 #include <vulkan/vulkan.h>
 
 #include <render_data.h>
+#include <UserInterface.h>
 
 class xcGraphics {
     public:
@@ -42,6 +43,8 @@ class xcGraphics {
     	VkShaderStorageBufferData mWorldPosBuffer{};
     	VkShaderStorageBufferData mBoneMatrixBuffer{};
 
+		UserInterface mUserInterface{};
+
 		void deviceInit();
 		void vmaInit();
 		void getQueues();
@@ -58,6 +61,12 @@ class xcGraphics {
 		void createRenderPass();
 		void createPipelineLayouts();
 		void createPipelines();
+		void createFramebuffer();
+		void createSyncObjects();
+
+		void initUserInterface();
+
+		// bool recreateSwapChain();
 };
 
 #endif //GRX_H
